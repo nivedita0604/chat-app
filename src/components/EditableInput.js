@@ -1,42 +1,46 @@
-import React, { useCallback, useState } from 'react';
-import { Alert, Icon, Input, InputGroup } from 'rsuite';
+import React, { useState, useCallback } from 'react';
+import { Input, InputGroup, Icon, Alert } from 'rsuite';
 
 const EditableInput = ({
   initialValue,
   onSave,
   label = null,
-  placeholder = 'add your nickname',
-  emptyMsg = 'input is empty',
+  placeholder = 'Write your value',
+  emptyMsg = 'Input is empty',
+  wrapperClassName = '',
   ...inputProps
 }) => {
   const [input, setInput] = useState(initialValue);
-
-  const [isEditable, setIsEditabe] = useState(false);
-
-  const onEditClick = useCallback(() => {
-    // eslint-disable-next-line arrow-body-style
-    setIsEditabe(p => !p);
-    setInput(initialValue);
-  }, [initialValue]);
+  const [isEditable, setIsEditable] = useState(false);
 
   const onInputChange = useCallback(value => {
     setInput(value);
   }, []);
 
+  const onEditClick = useCallback(() => {
+    setIsEditable(p => {
+      return !p;
+    });
+    setInput(initialValue);
+  }, [initialValue]);
+
   const onSaveClick = async () => {
     const trimmed = input.trim();
+
     if (trimmed === '') {
       Alert.info(emptyMsg, 4000);
+      return;
     }
 
     if (trimmed !== initialValue) {
       await onSave(trimmed);
     }
-    setIsEditabe(false);
+
+    setIsEditable(false);
   };
 
   return (
-    <div>
+    <div className={wrapperClassName}>
       {label}
       <InputGroup>
         <Input
@@ -47,7 +51,6 @@ const EditableInput = ({
           onChange={onInputChange}
         />
         <InputGroup.Button onClick={onEditClick}>
-          Edit
           <Icon icon={isEditable ? 'close' : 'edit2'} />
         </InputGroup.Button>
         {isEditable && (

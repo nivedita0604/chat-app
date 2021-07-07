@@ -9,6 +9,7 @@ import { CurrentRoomProvider } from '../../context/current-room.context';
 
 const Chat = () => {
   const { chatId } = useParams();
+  console.log('chatid by param', chatId);
   const rooms = useRooms();
 
   if (!rooms) {
@@ -23,6 +24,7 @@ const Chat = () => {
     return <h6 className="text-center mt-page">chat {chatId} not found</h6>;
   }
 
+  console.log('current', currentRoom);
   const { name, description } = currentRoom;
   const currentRoomData = {
     name,

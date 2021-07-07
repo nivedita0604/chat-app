@@ -5,11 +5,11 @@ import { useModalState } from '../../misc/custom-hook';
 import { storage, database } from '../../misc/firebase';
 import { useProfile } from '../../context/profile.context';
 import ProfileAvatar from './ProfileAvatar';
+import { getUserUpdates } from '../../misc/helpers';
 
 const fileInputTypes = '.png, .jpeg, .jpg';
 
-const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg'];
-
+const acceptedFileTypes = ['image/png', 'image/jpeg', 'image/pjpeg'];
 const isValidFile = file => {
   return acceptedFileTypes.includes(file.type);
 };
@@ -20,7 +20,7 @@ const getBlob = canvas => {
       if (blob) {
         resolve(blob);
       } else {
-        reject(new Error('File process Error'));
+        reject(new Error('File process error'));
       }
     });
   });
@@ -30,11 +30,8 @@ const AvatarUploadBtn = () => {
   const { isOpen, open, close } = useModalState();
 
   const { profile } = useProfile();
-
-  const [isLoading, setIsLoading] = useState(false);
-
   const [img, setImg] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const avatarEditorRef = useRef();
 
   const onFileInputChange = ev => {
@@ -44,7 +41,7 @@ const AvatarUploadBtn = () => {
       const file = currFiles[0];
 
       if (isValidFile(file)) {
-        setImg(file); // <--------- SET IMAGE STATE
+        setImg(file);
 
         open();
       } else {
@@ -53,7 +50,6 @@ const AvatarUploadBtn = () => {
     }
   };
 
-  // onclick upload
   const onUploadClick = async () => {
     const canvas = avatarEditorRef.current.getImageScaledToCanvas();
 
@@ -71,11 +67,14 @@ const AvatarUploadBtn = () => {
 
       const downloadUrl = await uploadAvatarResult.ref.getDownloadURL();
 
-      const userAvatarRef = database
-        .ref(`/profiles/${profile.uid}`)
-        .child('avatar');
+      const updates = await getUserUpdates(
+        profile.uid,
+        'avatar',
+        downloadUrl,
+        database
+      );
 
-      userAvatarRef.set(downloadUrl);
+      await database.ref().update(updates);
 
       setIsLoading(false);
       Alert.info('Avatar has been uploaded', 4000);
@@ -98,7 +97,7 @@ const AvatarUploadBtn = () => {
           htmlFor="avatar-upload"
           className="d-block cursor-pointer padded"
         >
-          Select new Avatar
+          Select new avatar
           <input
             id="avatar-upload"
             type="file"
@@ -110,15 +109,14 @@ const AvatarUploadBtn = () => {
 
         <Modal show={isOpen} onHide={close}>
           <Modal.Header>
-            <Modal.Title>Adjust and upload new Avatar</Modal.Title>
+            <Modal.Title>Adjust and upload new avatar</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div className="d-flex justify-content-center align-items-center h-100">
               {img && (
                 <AvatarEditor
-                  // eslint-disable-next-line spaced-comment
                   ref={avatarEditorRef}
-                  image={img} // <--------- PASS IMAGE
+                  image={img}
                   width={200}
                   height={200}
                   border={10}
@@ -135,7 +133,7 @@ const AvatarUploadBtn = () => {
               onClick={onUploadClick}
               disabled={isLoading}
             >
-              Upload new Avatar
+              Upload new avatar
             </Button>
           </Modal.Footer>
         </Modal>

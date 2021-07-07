@@ -11,6 +11,7 @@ const index = () => {
     return v.name;
   });
 
+  console.log('name', name);
   const isMobile = useMediaQuery('(max-width: 992px)');
   return (
     <div>
