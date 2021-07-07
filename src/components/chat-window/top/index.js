@@ -15,7 +15,7 @@ const index = () => {
   return (
     <div>
       <div className="d-flex justify-context-between align-items-center">
-        <h4>
+        <h4 className="text-disappear d-flex align-items-center">
           <Icon
             componentClass={Link}
             to="/"
