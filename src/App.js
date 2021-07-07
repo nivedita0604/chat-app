@@ -4,21 +4,21 @@ import './styles/main.scss';
 
 import { Switch } from 'react-router';
 import Signin from './pages/Signin';
-import PrivateRouter from './components/PrivateRouter';
+import PrivateRoute from './components/PrivateRoute';
 import Home from './pages/Home/Index';
-import PublicRouter from './components/PublicRoute';
+import PublicRoute from './components/PublicRoute';
 import { ProfileProvider } from './context/profile.context';
 
 function App() {
   return (
     <ProfileProvider>
       <Switch>
-        <PublicRouter path="/signin">
+        <PublicRoute path="/signin">
           <Signin />
-        </PublicRouter>
-        <PrivateRouter path="/">
+        </PublicRoute>
+        <PrivateRoute path="/">
           <Home />
-        </PrivateRouter>
+        </PrivateRoute>
       </Switch>
     </ProfileProvider>
   );
