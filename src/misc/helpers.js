@@ -8,6 +8,8 @@ export function getNameInitials(name) {
   return splitName[0][0];
 }
 
+// for admins
+
 export function transformToArr(snapVal) {
   return snapVal ? Object.keys(snapVal) : [];
 }

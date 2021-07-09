@@ -7,12 +7,13 @@ import { useCurrentRoom } from '../../../context/current-room.context';
 import RoomInfoBtnModal from './RoomInfoBtnModal';
 import EditRoomBtnDrawer from './EditRoomBtnDrawer';
 
-const index = () => {
+const Top = () => {
   const name = useCurrentRoom(v => {
     return v.name;
   });
-
-  console.log('name', name);
+  const isAdmin = useCurrentRoom(v => {
+    return v.isAdmin;
+  });
   const isMobile = useMediaQuery('(max-width: 992px)');
   return (
     <div>
@@ -33,7 +34,7 @@ const index = () => {
         </h4>
 
         <ButtonToolbar className="ws-nowrap">
-          <EditRoomBtnDrawer />
+          {isAdmin && <EditRoomBtnDrawer />}
         </ButtonToolbar>
       </div>
 
@@ -44,4 +45,4 @@ const index = () => {
     </div>
   );
 };
-export default index;
+export default Top;
