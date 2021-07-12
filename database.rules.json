@@ -27,8 +27,15 @@
     },
     "status": {
       "$user_id": {
-        ".read": "$user_id !== null",
+        ".read": "auth !== null",
         ".write": "$user_id === auth.uid"
+      }
+    },
+    "fcm_tokens": {
+      ".indexOn": ".value",
+      "$token_id": {
+        ".read": false,
+        ".write": "newData.val() === auth.uid"
       }
     },
     ".read": false,

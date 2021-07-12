@@ -5,7 +5,6 @@ import { useModalState } from '../../../misc/custom-hook';
 
 const RoomInfoBtnModal = () => {
   const { isOpen, close, open } = useModalState();
-  // group description and name
   const description = useCurrentRoom(v => {
     return v.description;
   });
