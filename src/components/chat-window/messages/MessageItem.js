@@ -2,20 +2,30 @@ import React, { memo } from 'react';
 import TimeAgo from 'timeago-react';
 import { Button } from 'rsuite';
 import ProfileAvatar from '../../dashboard/ProfileAvatar';
-import PresenceDot from '../../PresenceDot';
 import ProfileInfoBtnModal from './ProfileInfoBtnModal';
+import PresenceDot from '../../PresenceDot';
 import { useCurrentRoom } from '../../../context/current-room.context';
 import { auth } from '../../../misc/firebase';
 import { useHover, useMediaQuery } from '../../../misc/custom-hook';
 import IconBtnControl from './IconBtnControl';
 import ImgBtnModal from './ImgBtnModal';
 
-const renderFilesMessage = file => {
+const renderFileMessage = file => {
   if (file.contentType.includes('image')) {
     return (
       <div className="height-220">
-        <ImgBtnModal src={file.url} filename={file.name} />
+        <ImgBtnModal src={file.url} fileName={file.name} />
       </div>
+    );
+  }
+
+  if (file.contentType.includes('audio')) {
+    return (
+      // eslint-disable-next-line jsx-a11y/media-has-caption
+      <audio controls>
+        <source src={file.url} type="audio/mp3" />
+        Your browser does not support the audio element.
+      </audio>
     );
   }
 
@@ -26,17 +36,19 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
   const { author, createdAt, text, file, likes, likeCount } = message;
 
   const [selfRef, isHovered] = useHover();
+  const isMobile = useMediaQuery('(max-width: 992px)');
+
   const isAdmin = useCurrentRoom(v => {
     return v.isAdmin;
   });
   const admins = useCurrentRoom(v => {
     return v.admins;
   });
-  const isMobile = useMediaQuery('(max-width: 992px)');
+
   const isMsgAuthorAdmin = admins.includes(author.uid);
   const isAuthor = auth.currentUser.uid === author.uid;
-
   const canGrantAdmin = isAdmin && !isAuthor;
+
   const canShowIcons = isMobile || isHovered;
   const isLiked = likes && Object.keys(likes).includes(auth.currentUser.uid);
 
@@ -47,6 +59,7 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
     >
       <div className="d-flex align-items-center font-bolder mb-1">
         <PresenceDot uid={author.uid} />
+
         <ProfileAvatar
           src={author.avatar}
           name={author.name}
@@ -68,16 +81,16 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
               color="blue"
             >
               {isMsgAuthorAdmin
-                ? 'remove admin permissions'
-                : 'Give admin permission in this Room '}
+                ? 'Remove admin permission'
+                : 'Give admin in this room'}
             </Button>
           )}
         </ProfileInfoBtnModal>
-
         <TimeAgo
           datetime={createdAt}
           className="font-normal text-black-45 ml-2"
         />
+
         <IconBtnControl
           {...(isLiked ? { color: 'red' } : {})}
           isVisible={canShowIcons}
@@ -94,14 +107,15 @@ const MessageItem = ({ message, handleAdmin, handleLike, handleDelete }) => {
             iconName="close"
             tooltip="Delete this message"
             onClick={() => {
-              return handleDelete(message.id);
+              return handleDelete(message.id, file);
             }}
           />
         )}
       </div>
+
       <div>
-        {text && <span className="word-break-all">{text}</span>}
-        {file && renderFilesMessage(file)}
+        {text && <span className="word-breal-all">{text}</span>}
+        {file && renderFileMessage(file)}
       </div>
     </li>
   );
