@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router';
-import { Alert, Button, Icon, InputGroup, Modal, Uploader } from 'rsuite';
+import { InputGroup, Icon, Modal, Button, Uploader, Alert } from 'rsuite';
 import { useModalState } from '../../../misc/custom-hook';
 import { storage } from '../../../misc/firebase';
 
 const MAX_FILE_SIZE = 1000 * 1024 * 5;
 
 const AttachmentBtnModal = ({ afterUpload }) => {
-  const { isOpen, open, close } = useModalState();
   const { chatId } = useParams();
+  const { isOpen, close, open } = useModalState();
+
   const [fileList, setFileList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -18,6 +19,7 @@ const AttachmentBtnModal = ({ afterUpload }) => {
         return el.blobFile.size <= MAX_FILE_SIZE;
       })
       .slice(0, 5);
+
     setFileList(filtered);
   };
 
@@ -31,8 +33,9 @@ const AttachmentBtnModal = ({ afterUpload }) => {
             cacheControl: `public, max-age=${3600 * 24 * 3}`,
           });
       });
-      const uploadSnapshots = await Promise.all(uploadPromises);
 
+      const uploadSnapshots = await Promise.all(uploadPromises);
+      // to shape promises
       const shapePromises = uploadSnapshots.map(async snap => {
         return {
           contentType: snap.metadata.contentType,
@@ -41,20 +44,18 @@ const AttachmentBtnModal = ({ afterUpload }) => {
         };
       });
 
-      // to shape the promises
       const files = await Promise.all(shapePromises);
 
       await afterUpload(files);
-
-      setFileList(files);
 
       setIsLoading(false);
       close();
     } catch (err) {
       setIsLoading(false);
-      Alert.error(err.message, 4000);
+      Alert.error(err.message);
     }
   };
+
   return (
     <>
       <InputGroup.Button onClick={open}>
@@ -62,14 +63,15 @@ const AttachmentBtnModal = ({ afterUpload }) => {
       </InputGroup.Button>
       <Modal show={isOpen} onHide={close}>
         <Modal.Header>
-          <Modal.Title>Upload Files</Modal.Title>
+          <Modal.Title>Upload files</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Uploader
             autoUpload={false}
-            fileList={fileList}
             action=""
+            fileList={fileList}
             onChange={onChange}
+            multiple
             listType="picture-text"
             className="w-100"
             disabled={isLoading}
@@ -77,10 +79,10 @@ const AttachmentBtnModal = ({ afterUpload }) => {
         </Modal.Body>
         <Modal.Footer>
           <Button block disabled={isLoading} onClick={onUpload}>
-            Send to Chat
+            Send to chat
           </Button>
-          <div className="texr-tight mt-2">
-            <small>* Only Files less than 5MB </small>
+          <div className="text-right mt-2">
+            <small>* only files less than 5 mb are allowed</small>
           </div>
         </Modal.Footer>
       </Modal>

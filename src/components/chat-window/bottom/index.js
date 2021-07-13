@@ -23,7 +23,6 @@ function assembleMessage(profile, chatId) {
 
 const Bottom = () => {
   const [input, setInput] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
 
   const { chatId } = useParams();
@@ -34,7 +33,7 @@ const Bottom = () => {
   }, []);
 
   const onSendClick = async () => {
-    if (input.trim === '') {
+    if (input.trim() === '') {
       return;
     }
     // to assemble the messages (text,files , voice etc)
@@ -44,10 +43,9 @@ const Bottom = () => {
     const updates = {};
     // we will get new unique  key from realtime database without creating actual document
     const messageId = database.ref('messages').push().key;
-
     updates[`/messages/${messageId}`] = msgData;
     updates[`/rooms/${chatId}/lastMessage`] = {
-      ...msgData, // all messages
+      ...msgData,
       msgId: messageId,
     };
 
@@ -77,29 +75,30 @@ const Bottom = () => {
       const updates = {};
 
       files.forEach(file => {
-        const msgData = assembleMessage(profile, chatId);
+        const msgData = assembleMessage(profile, window.chatId);
         msgData.file = file;
+
         const messageId = database.ref('messages').push().key;
 
         updates[`/messages/${messageId}`] = msgData;
       });
+
       const lastMsgId = Object.keys(updates).pop();
 
-      updates[`/rooms/${chatId}/lastMessage`] = {
-        ...updates[lastMsgId], // all messages
+      updates[`/rooms/${window.chatId}/lastMessage`] = {
+        ...updates[lastMsgId],
         msgId: lastMsgId,
       };
 
       try {
         await database.ref().update(updates);
-
         setIsLoading(false);
       } catch (err) {
         setIsLoading(false);
         Alert.error(err.message);
       }
     },
-    [chatId, profile]
+    [profile]
   );
 
   return (
@@ -108,11 +107,12 @@ const Bottom = () => {
         <AttachmentBtnModal afterUpload={afterUpload} />
         <AudioMsgBtn afterUpload={afterUpload} />
         <Input
-          placeholder="Write your message here..."
+          placeholder="Write a new message here..."
           value={input}
           onChange={onInputChange}
           onKeyDown={onKeyDown}
         />
+
         <InputGroup.Button
           color="blue"
           appearance="primary"

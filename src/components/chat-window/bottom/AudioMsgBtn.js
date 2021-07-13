@@ -6,7 +6,7 @@ import { storage } from '../../../misc/firebase';
 
 const AudioMsgBtn = ({ afterUpload }) => {
   const { chatId } = useParams();
-  console.log('chatid', chatId);
+
   const [isRecording, setIsRecording] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -26,6 +26,7 @@ const AudioMsgBtn = ({ afterUpload }) => {
           .put(data.blob, {
             cacheControl: `public, max-age=${3600 * 24 * 3}`,
           });
+
         const file = {
           contentType: snap.metadata.contentType,
           name: snap.metadata.name,

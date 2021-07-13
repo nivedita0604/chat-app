@@ -2,8 +2,9 @@ import React from 'react';
 import { Modal } from 'rsuite';
 import { useModalState } from '../../../misc/custom-hook';
 
-const ImgBtnModal = ({ src, filename }) => {
+const ImgBtnModal = ({ src, fileName }) => {
   const { isOpen, open, close } = useModalState();
+
   return (
     <>
       <input
@@ -15,16 +16,16 @@ const ImgBtnModal = ({ src, filename }) => {
       />
       <Modal show={isOpen} onHide={close}>
         <Modal.Header>
-          <Modal.Title>{filename}</Modal.Title>
+          <Modal.Title>{fileName}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div>
-            <img src={src} height="100%" width="100% " alt="file" />
+            <img src={src} height="100%" width="100%" alt="file" />
           </div>
         </Modal.Body>
         <Modal.Footer>
           <a href={src} target="_blank" rel="noopener noreferrer">
-            View Original
+            View original
           </a>
         </Modal.Footer>
       </Modal>
